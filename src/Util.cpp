@@ -221,6 +221,12 @@ int socket_bind_listen(int port)
     server_addr.sin_addr.s_addr=htonl(INADDR_ANY);
     server_addr.sin_family=AF_INET;
     server_addr.sin_port=htons(port);
+    int nOptval=1;
+    // 消除bind时"Address already in use"错误
+    if((setsockopt(fd,SOL_SOCKET,SO_REUSEADDR,(const void*)&nOptval,sizeof(nOptval)))<0){
+        close(fd);
+        return -1;
+    }
     //bind
     if((bind(fd,(struct sockaddr*)&server_addr,sizeof(server_addr)))<0){
         perror("bind error");
